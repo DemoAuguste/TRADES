@@ -11,6 +11,8 @@ from models.net_mnist import *
 from models.small_cnn import *
 from trades import trades_loss
 
+from gravel import *
+
 
 parser = argparse.ArgumentParser(description='PyTorch MNIST TRADES Adversarial Training')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
@@ -69,6 +71,11 @@ def train(args, model, device, train_loader, optimizer, epoch):
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
 
+        origin_output = model(input)
+        optimizer.zero_grad()
+        grad = get_grad(model, origin_output, target, optimizer, nn.CrossEntropyLoss())
+
+
         optimizer.zero_grad()
 
         # calculate robust loss
@@ -82,7 +89,15 @@ def train(args, model, device, train_loader, optimizer, epoch):
                            beta=args.beta)
 
         loss.backward()
+        adv_grad = get_clear_grad(model)
+
+        # gravel
+        layer_mask = get_grad_diff_layer_mask(grad, adv_grad, ratio=0.1)
+        ret_grad = generate_grad(grad, adv_grad, layer_mask=layer_mask)
+        set_grad(model, ret_grad)
+
         optimizer.step()
+
 
         # print progress
         if batch_idx % args.log_interval == 0:
@@ -163,9 +178,9 @@ def main():
         # save checkpoint
         if epoch % args.save_freq == 0:
             torch.save(model.state_dict(),
-                       os.path.join(model_dir, 'model-nn-epoch{}.pt'.format(epoch)))
+                       os.path.join(model_dir, 'gravel-nn-epoch{}.pt'.format(epoch)))
             torch.save(optimizer.state_dict(),
-                       os.path.join(model_dir, 'opt-nn-checkpoint_epoch{}.tar'.format(epoch)))
+                       os.path.join(model_dir, 'gravel-nn-checkpoint_epoch{}.tar'.format(epoch)))
 
 
 if __name__ == '__main__':
