@@ -71,7 +71,7 @@ def train(args, model, device, train_loader, optimizer, epoch):
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
 
-        origin_output = model(input)
+        origin_output = model(data)
         optimizer.zero_grad()
         grad = get_grad(model, origin_output, target, optimizer, nn.CrossEntropyLoss())
 
