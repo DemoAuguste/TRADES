@@ -27,13 +27,13 @@ parser.add_argument('--random',
                     default=True,
                     help='random initialization for PGD')
 parser.add_argument('--model-path',
-                    default='./checkpoints/model_mnist_smallcnn.pt',
+                    default='./model-mnist-smallCNN/model-nn-epoch100.pt',
                     help='model for white-box attack evaluation')
 parser.add_argument('--source-model-path',
-                    default='./checkpoints/model_mnist_smallcnn.pt',
+                    default='./model-mnist-smallCNN/model-nn-epoch100.pt',
                     help='source model for black-box attack evaluation')
 parser.add_argument('--target-model-path',
-                    default='./checkpoints/model_mnist_smallcnn.pt',
+                    default='./model-mnist-smallCNN/model-nn-epoch100.pt',
                     help='target model for black-box attack evaluation')
 parser.add_argument('--white-box-attack', default=True,
                     help='whether perform white-box attack')
